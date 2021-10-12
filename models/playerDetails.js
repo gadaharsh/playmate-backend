@@ -15,6 +15,11 @@ const playerSchema = mongoose.Schema({
     required: true,
     default: "+91",
   },
+  gender: {
+    type: String,
+    required: true,
+    default: "Male",
+  },
   email: {
     type: String,
   },
