@@ -18,7 +18,7 @@ export const playerSignup = async (req, res) => {
     console.log(playerData);
     res.status(201).json(playerData);
   } catch (error) {
-    /* var message = error.message;
+    var message = error.message;
     try {
       const playerData = await player.find({ contact: body.contact });
       if (playerData.length > 0) {
@@ -36,7 +36,7 @@ export const playerSignup = async (req, res) => {
       }
     } catch (error) {
       res.status(409).json({ message: message });
-    } */
+    }
     res.status(409).json({ message: error.message });
   }
 };
