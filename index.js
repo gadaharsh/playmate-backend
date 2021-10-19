@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import testRoute from './routes/test.js'
 import playerRoute from './routes/players.js'
+import eventRoute from './routes/events.js'
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(cors());
 
 app.use('/',testRoute);
 app.use('/player',playerRoute)
+app.use('/event',eventRoute)
 
 const CONNECTION_URL =
   "mongodb+srv://rushil:Playmate10$@cluster0.lcuyx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
