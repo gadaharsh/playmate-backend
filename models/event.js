@@ -56,7 +56,11 @@ const eventScehma = mongoose.Schema({
   additionalAddressInfo: {
     type: String,
     required: false,
-  }
+  },
+  currency: {
+    type: String,
+    default: "INR",
+  },
 });
 
 const event = mongoose.model("event", eventScehma);
