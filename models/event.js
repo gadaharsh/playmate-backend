@@ -64,6 +64,10 @@ const eventScehma = mongoose.Schema({
       required: true,
     },
   },
+  gender: {
+    type: String,
+    default: "Male",
+  },
 });
 
 const event = mongoose.model("event", eventScehma);
