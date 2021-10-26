@@ -29,7 +29,7 @@ export const getEventsNearMe = async (req, res) => {
       },
     },
     day: {
-      $gt: new Date(Date.now()),
+      $gte: new Date(Date.now()),
     },
   };
   if (req.body.sport) {
@@ -56,6 +56,7 @@ export const getEventsNearMe = async (req, res) => {
   const skip = (page - 1) * size;
   event
     .find(options)
+    .sort({ day: 1 })
     .limit(limit)
     .skip(skip)
     .then((data) => {
