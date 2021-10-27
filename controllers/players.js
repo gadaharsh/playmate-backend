@@ -48,6 +48,8 @@ export const playerSignin = async (req, res) => {
   console.log(contact);
   try {
     const playerData = await player.find({ contact: contact });
+    console.log(playerData);
+    console.log(playerData[0]);
     if (playerData.length > 0) {
       const token = jwt.sign(
         playerData[0].toJSON(),
