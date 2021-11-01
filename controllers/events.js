@@ -31,6 +31,9 @@ export const getEventsNearMe = async (req, res) => {
     day: {
       $gte: new Date(Date.now()),
     },
+    rem_players: {
+      $gt: 0,
+    },
   };
   if (req.body.sport) {
     options.sport = req.body.sport;
