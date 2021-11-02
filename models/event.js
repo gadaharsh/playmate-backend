@@ -68,6 +68,10 @@ const eventScehma = mongoose.Schema({
     type: String,
     default: "Male",
   },
+  joinedPlayers: {
+    type: [String],
+    default: [],
+  },
 });
 
 const event = mongoose.model("event", eventScehma);

@@ -23,7 +23,7 @@ const requestSchema = mongoose.Schema({
   },
   cancelledAt: {
     type: Date,
-    default: new Date(),
+    required: false,
   },
   rejection_reason: {
     type: String,
@@ -31,7 +31,7 @@ const requestSchema = mongoose.Schema({
   },
   rejectedAt: {
     type: Date,
-    default: new Date(),
+    required: false,
   },
 });
 

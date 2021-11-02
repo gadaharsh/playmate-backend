@@ -5,6 +5,7 @@ import cors from "cors";
 import testRoute from "./routes/test.js";
 import playerRoute from "./routes/players.js";
 import eventRoute from "./routes/events.js";
+import requestRoute from "./routes/requests.js";
 import playerAuth from "./util/playerAuth.js";
 import { createEvent } from "./controllers/events.js";
 
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use("/", testRoute);
 app.use("/player", playerRoute);
 app.use("/event", eventRoute);
+app.use("/booking", requestRoute);
 
 const CONNECTION_URL =
   "mongodb+srv://rushil:Playmate10$@cluster0.lcuyx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
