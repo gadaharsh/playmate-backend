@@ -5,6 +5,7 @@ export const createEvent = async (req, res) => {
   var id = req.player._id;
   body.organiserId = id;
   body.gender = req.player.gender;
+  body.organiserContact = req.player.contact;
   console.log(body);
   const newEvent = new event(body);
   try {
@@ -44,7 +45,7 @@ export const getEventsNearMe = async (req, res) => {
   if (req.body.gender) {
     options.gender = req.body.gender;
   }
-  console.log(new Date(Date.now()));
+  console.log(options);
   if (req.body.day) {
     options.day = { $gte: req.body.day };
   }
