@@ -33,6 +33,10 @@ const eventScehma = mongoose.Schema({
     type: String,
     required: true,
   },
+  organiserContact: {
+    type: String,
+    required: false,
+  },
   age: {
     type: Number,
     required: true,
