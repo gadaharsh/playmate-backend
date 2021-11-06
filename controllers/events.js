@@ -76,6 +76,25 @@ export const getEventsNearMe = async (req, res) => {
     });
 };
 
+export const getEventsOrganisedByMe = () => {
+  var id = req.player._id;
+  var options = {
+    organiserId: id,
+  };
+  event
+    .find(options)
+    .sort({ day: 1 })
+    .then((data) => {
+      var result = {
+        data,
+      };
+      res.status(201).json(result);
+    })
+    .catch((error) => {
+      res.status(409).json({ message: error.message });
+    });
+};
+
 export const getEventsDummy = async (req, res) => {
   try {
     const events = await event.find();
