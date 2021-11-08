@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createEvent,
+  getAllEventDetails,
   getEventsDummy,
   getEventsNearMe,
   getEventsOrganisedByMe,
@@ -13,5 +14,6 @@ router.get("/dummy", getEventsDummy);
 router.post("/nearMe", getEventsNearMe);
 router.post("/create", playerAuth, createEvent);
 router.get("/player", playerAuth, getEventsOrganisedByMe);
+router.get("/:id", getAllEventDetails);
 
 export default router;

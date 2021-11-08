@@ -76,6 +76,18 @@ const eventScehma = mongoose.Schema({
     type: [String],
     default: [],
   },
+  eventStatus: {
+    type: String,
+    default: "created",
+  },
+  cancelledAt: {
+    type: String,
+    required: false,
+  },
+  cancellationReason: {
+    type: String,
+    required: false,
+  },
 });
 
 const event = mongoose.model("event", eventScehma);

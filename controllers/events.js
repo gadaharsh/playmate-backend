@@ -1,5 +1,8 @@
+import mongoose from "mongoose";
 import event from "../models/event.js";
-
+import player from "../models/playerDetails.js";
+import request from "../models/request.js";
+var ObjectId = mongoose.Types.ObjectId;
 export const createEvent = async (req, res) => {
   const body = req.body;
   var id = req.player._id;
@@ -93,6 +96,36 @@ export const getEventsOrganisedByMe = async (req, res) => {
     .catch((error) => {
       res.status(409).json({ message: error.message });
     });
+};
+
+export const getAllEventDetails = async (req, res) => {
+  const id = req.params.id;
+  var options = {
+    _id: id,
+  };
+  if (!ObjectId.isValid(id)) {
+    return res.status(409).json({ message: "No Valid Event For this Id" });
+  }
+  var filters = {
+    eventId: id,
+    requestType: "Join Event",
+  };
+  var eventDetails = await event.find(options);
+  if (eventDetails.length < 1) {
+    res.status(409).json({ message: "No Event WIth This Id" });
+  }
+  var joiningPlayers = await request.find(filters);
+  var players = [];
+  for (var i = 0; i < joiningPlayers.length; i++) {
+    var playerData = await player.find({ _id: joiningPlayers[i].playerId });
+    players.push(playerData[0]);
+  }
+  var result = {
+    event: eventDetails[0],
+    players: players,
+  };
+  console.log(result);
+  res.status(201).json(result);
 };
 
 export const getEventsDummy = async (req, res) => {
