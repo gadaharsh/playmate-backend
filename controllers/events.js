@@ -76,14 +76,14 @@ export const getEventsNearMe = async (req, res) => {
     });
 };
 
-export const getEventsOrganisedByMe = () => {
+export const getEventsOrganisedByMe = async (req, res) => {
   var id = req.player._id;
   var options = {
     organiserId: id,
   };
   event
     .find(options)
-    .sort({ day: 1 })
+    .sort({ day: -1 })
     .then((data) => {
       var result = {
         data,
