@@ -88,6 +88,10 @@ const eventScehma = mongoose.Schema({
     type: String,
     required: false,
   },
+  rejectedPlayersId: {
+    type: [String],
+    default: [],
+  },
 });
 
 const event = mongoose.model("event", eventScehma);
