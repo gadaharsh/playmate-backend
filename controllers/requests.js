@@ -12,6 +12,7 @@ export const joinEvent = async (req, res) => {
     const ifJoined = await request.find({
       eventId: eventId,
       playerId: playerId,
+      requestType: "Join Event",
     });
     if (ifJoined.length > 0) {
       res.status(400).json({ error: "You are already part of the event" });
@@ -54,6 +55,9 @@ export const rejectPlayer = async (req, res) => {
         $push: {
           rejectedPlayersId: playerId,
         },
+        $pull: {
+          joinedPlayers: playerId,
+        },
         $inc: {
           rem_players: 1,
         },
@@ -83,3 +87,43 @@ export const rejectPlayer = async (req, res) => {
   }
 };
 
+export const backoutFromEvent = async (req, res) => {
+  var eventId = req.body.eventId;
+  var playerId = req.body.playerId;
+  var backoutReason = req.body.backoutReason;
+  console.log(req.body);
+  try {
+    await event.findOneAndUpdate(
+      { _id: eventId },
+      {
+        $inc: {
+          rem_players: 1,
+        },
+        $pull: {
+          joinedPlayers: playerId,
+        },
+      }
+    );
+    await request.findOneAndUpdate(
+      {
+        eventId: eventId,
+        playerId: playerId,
+      },
+      {
+        $set: {
+          cancellation_reason: backoutReason,
+          requestType: "Cancelled",
+          cancelledAt: new Date(),
+        },
+      }
+    );
+    var response = {
+      message: "Player Cancelled",
+      eventId,
+      playerId,
+    };
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+};
