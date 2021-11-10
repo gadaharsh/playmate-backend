@@ -33,6 +33,10 @@ const requestSchema = mongoose.Schema({
     type: Date,
     required: false,
   },
+  eventDay: {
+    type: Date,
+    required: false,
+  },
 });
 
 const request = mongoose.model("request", requestSchema);

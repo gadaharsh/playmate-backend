@@ -86,7 +86,7 @@ export const getEventsOrganisedByMe = async (req, res) => {
   };
   event
     .find(options)
-    .sort({ day: -1 })
+    .sort({ day: 1 })
     .then((data) => {
       var result = {
         data,
@@ -126,6 +126,36 @@ export const getAllEventDetails = async (req, res) => {
   };
   console.log(result);
   res.status(201).json(result);
+};
+
+export const getJoinedPlayerEvents = async (req, res) => {
+  var playerId = req.player._id;
+  var options = {
+    playerId: playerId,
+    requestType: "Join Event",
+  };
+  try {
+    var events = await request.find(options);
+    console.log(events);
+    if (events.length < 1) {
+      var result = {
+        data: [],
+      };
+      return res.status(200).json(result);
+    }
+    var joinedEvents = [];
+    for (var i = 0; i < events.length; i++) {
+      var joined = await event.find({ _id: events[i].eventId });
+      console.log(joined);
+      joinedEvents.push(joined[0]);
+    }
+    var result = {
+      data: joinedEvents,
+    };
+    return res.status(200).json(result);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
 };
 
 export const getEventsDummy = async (req, res) => {

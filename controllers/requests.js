@@ -6,6 +6,7 @@ export const joinEvent = async (req, res) => {
   var playerId = req.player._id;
   body.playerId = playerId;
   body.requestType = "Join Event";
+  body.eventDay = req.body.eventDay;
   var eventId = req.body.eventId;
   try {
     const ifJoined = await request.find({
@@ -81,3 +82,4 @@ export const rejectPlayer = async (req, res) => {
     res.status(409).json({ message: error.message });
   }
 };
+
