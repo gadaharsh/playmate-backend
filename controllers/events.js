@@ -108,7 +108,7 @@ export const getAllEventDetails = async (req, res) => {
   }
   var filters = {
     eventId: id,
-    requestType: "Join Event",
+    //requestType: "Join Event",
   };
   var eventDetails = await event.find(options);
   if (eventDetails.length < 1) {
@@ -116,13 +116,23 @@ export const getAllEventDetails = async (req, res) => {
   }
   var joiningPlayers = await request.find(filters);
   var players = [];
+  var rejectedPlayers = [];
+  var backedOutPlayers = [];
   for (var i = 0; i < joiningPlayers.length; i++) {
     var playerData = await player.find({ _id: joiningPlayers[i].playerId });
-    players.push(playerData[0]);
+    if (joiningPlayers[i].requestType === "Join Event") {
+      players.push(playerData[0]);
+    } else if (joiningPlayers[i].requestType === "Rejected") {
+      rejectedPlayers.push(playerData[0])
+    } else {
+      backedOutPlayers.push(playerData[0])
+    }
   }
   var result = {
     event: eventDetails[0],
     players: players,
+    rejectedPlayers,
+    backedOutPlayers
   };
   console.log(result);
   res.status(201).json(result);
@@ -157,6 +167,68 @@ export const getJoinedPlayerEvents = async (req, res) => {
     res.status(409).json({ message: error.message });
   }
 };
+
+export const getBackedOutEvents = async (req, res) => {
+  var playerId = req.player._id;
+  var options = {
+    playerId: playerId,
+    requestType: "Cancelled",
+  };
+  try {
+    var events = await request.find(options);
+    console.log(events);
+    if (events.length < 1) {
+      var result = {
+        data: [],
+      };
+      return res.status(200).json(result);
+    }
+    var backedoutEvents = [];
+    for (var i = 0; i < events.length; i++) {
+      var joined = await event.find({ _id: events[i].eventId });
+      joined.push(events[i])
+      console.log(joined)
+      backedoutEvents.push(joined);
+    }
+    var result = {
+      data: backedoutEvents,
+    };
+    return res.status(200).json(result);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+}
+
+export const getRejectedEvents = async (req, res) => {
+  var playerId = req.player._id;
+  var options = {
+    playerId: playerId,
+    requestType: "Rejected",
+  };
+  try {
+    var events = await request.find(options);
+    console.log(events);
+    if (events.length < 1) {
+      var result = {
+        data: [],
+      };
+      return res.status(200).json(result);
+    }
+    var rejectedEvents = [];
+    for (var i = 0; i < events.length; i++) {
+      var joined = await event.find({ _id: events[i].eventId });
+      joined.push(events[i])
+      console.log(joined)
+      rejectedEvents.push(joined);
+    }
+    var result = {
+      data: rejectedEvents,
+    };
+    return res.status(200).json(result);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+}
 
 export const getEventsDummy = async (req, res) => {
   try {
