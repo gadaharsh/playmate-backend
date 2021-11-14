@@ -73,7 +73,7 @@ export const playerSignin = async (req, res) => {
 };
 
 export const getPlayerProfile = async (req, res) => {
-  var playerId = req.player._id;
+  var playerId = req.params.id;
   try {
     var organisedFilter = {
       organiserId: playerId

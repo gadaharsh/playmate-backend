@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/', getPlayers);
 router.post('/signup', playerSignup)
 router.post('/login', playerSignin)
-router.get('/profile', playerAuth, getPlayerProfile)
+router.get('/profile/:id', getPlayerProfile)
 //router.delete('/delete', deleteAllPlayers)
 
 export default router;
