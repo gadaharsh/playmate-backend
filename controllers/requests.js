@@ -127,3 +127,12 @@ export const backoutFromEvent = async (req, res) => {
     res.status(409).json({ message: error.message });
   }
 };
+
+export const deleteAllRequests = async (req, res) => {
+  try {
+    await request.deleteMany({});
+    res.status(200).json({ message: "Requests Deleted" })
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+}

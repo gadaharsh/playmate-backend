@@ -238,3 +238,12 @@ export const getEventsDummy = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+
+export const deleteAllEvents = async (req, res) => {
+  try {
+    await event.deleteMany({});
+    res.status(200).json({ message: "Events Deleted" })
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+}

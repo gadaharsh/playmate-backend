@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createEvent,
+  deleteAllEvents,
   getAllEventDetails,
   getBackedOutEvents,
   getEventsDummy,
@@ -21,5 +22,6 @@ router.get("/player/joined", playerAuth, getJoinedPlayerEvents);
 router.get("/player/cancelled", playerAuth, getBackedOutEvents);
 router.get("/player/rejected", playerAuth, getRejectedEvents);
 router.get("/:id", getAllEventDetails);
+//router.delete("/delete", deleteAllEvents)
 
 export default router;

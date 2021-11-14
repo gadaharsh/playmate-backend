@@ -26,7 +26,7 @@ const playerSchema = mongoose.Schema({
   image: {
     type: String,
     default:
-      "https://www.cornwallbusinessawards.co.uk/wp-content/uploads/2017/11/dummy450x450.jpg",
+      "https://cdn.pixabay.com/photo/2018/04/18/18/56/user-3331257__340.png",
   },
   verified: {
     type: Boolean,
@@ -38,7 +38,7 @@ const playerSchema = mongoose.Schema({
   },
   rating: {
     type: Number,
-    default: 0,
+    default: 2,
   },
 });
 
