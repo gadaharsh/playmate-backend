@@ -123,16 +123,27 @@ export const getAllEventDetails = async (req, res) => {
     if (joiningPlayers[i].requestType === "Join Event") {
       players.push(playerData[0]);
     } else if (joiningPlayers[i].requestType === "Rejected") {
-      rejectedPlayers.push(playerData[0])
+      var p2 = {
+        ...playerData[0]._doc,
+        requestInfo: joiningPlayers[i]
+      }
+      rejectedPlayers.push(p2)
     } else {
-      backedOutPlayers.push(playerData[0])
+      var p = {
+        ...playerData[0]._doc,
+        requestInfo: joiningPlayers[i]
+      }
+      //backedOutPlayers.push(playerData[0])
+      backedOutPlayers.push(p)
     }
   }
+  var organiserDetails = await player.find({ _id: eventDetails[0].organiserId });
   var result = {
     event: eventDetails[0],
     players: players,
     rejectedPlayers,
-    backedOutPlayers
+    backedOutPlayers,
+    organiserDetails: organiserDetails[0]
   };
   console.log(result);
   res.status(201).json(result);
