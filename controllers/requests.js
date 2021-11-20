@@ -12,10 +12,28 @@ export const joinEvent = async (req, res) => {
     const ifJoined = await request.find({
       eventId: eventId,
       playerId: playerId,
-      requestType: "Join Event",
+      //requestType: "Join Event",
     });
-    if (ifJoined.length > 0) {
+    if (ifJoined.length > 0 && ifJoined.requestType === "Join Event") {
       res.status(400).json({ error: "You are already part of the event" });
+    } else if (ifJoined.length > 0 && (ifJoined.requestType !== "Join Event")) {
+      await request.findOneAndUpdate(
+        {
+          eventId: eventId,
+          playerId: playerId,
+        },
+        {
+          $set: {
+            requestType: "Join Event",
+            createdAt: new Date()
+          },
+        }
+      );
+      var response = {
+        message: "Event Joined",
+        eventId,
+      };
+      res.status(200).json(response);
     } else {
       const joinRequest = new request(body);
       await joinRequest.save();

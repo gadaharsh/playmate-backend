@@ -83,10 +83,32 @@ export const getEventsOrganisedByMe = async (req, res) => {
   var id = req.player._id;
   var options = {
     organiserId: id,
+    day: {
+      $gte: new Date(Date.now()),
+    },
   };
   event
     .find(options)
     .sort({ day: 1 })
+    .then((data) => {
+      var result = {
+        data,
+      };
+      res.status(201).json(result);
+    })
+    .catch((error) => {
+      res.status(409).json({ message: error.message });
+    });
+};
+
+export const getAllEventsOrganisedByMe = async (req, res) => {
+  var id = req.player._id;
+  var options = {
+    organiserId: id,
+  };
+  event
+    .find(options)
+    .sort({ day: -1 })
     .then((data) => {
       var result = {
         data,
@@ -154,9 +176,42 @@ export const getJoinedPlayerEvents = async (req, res) => {
   var options = {
     playerId: playerId,
     requestType: "Join Event",
+    eventDay: {
+      $gte: new Date(Date.now()),
+    },
   };
   try {
-    var events = await request.find(options);
+    var events = await request.find(options).sort({ eventDay: 1 });
+    console.log(events);
+    if (events.length < 1) {
+      var result = {
+        data: [],
+      };
+      return res.status(200).json(result);
+    }
+    var joinedEvents = [];
+    for (var i = 0; i < events.length; i++) {
+      var joined = await event.find({ _id: events[i].eventId });
+      console.log(joined);
+      joinedEvents.push(joined[0]);
+    }
+    var result = {
+      data: joinedEvents,
+    };
+    return res.status(200).json(result);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+};
+
+export const getAllJoinedPlayerEvents = async (req, res) => {
+  var playerId = req.player._id;
+  var options = {
+    playerId: playerId,
+    requestType: "Join Event",
+  };
+  try {
+    var events = await request.find(options).sort({ eventDay: -1 });
     console.log(events);
     if (events.length < 1) {
       var result = {
@@ -184,9 +239,43 @@ export const getBackedOutEvents = async (req, res) => {
   var options = {
     playerId: playerId,
     requestType: "Cancelled",
+    eventDay: {
+      $gte: new Date(Date.now()),
+    },
   };
   try {
-    var events = await request.find(options);
+    var events = await request.find(options).sort({ eventDay: 1 });
+    console.log(events);
+    if (events.length < 1) {
+      var result = {
+        data: [],
+      };
+      return res.status(200).json(result);
+    }
+    var backedoutEvents = [];
+    for (var i = 0; i < events.length; i++) {
+      var joined = await event.find({ _id: events[i].eventId });
+      joined.push(events[i])
+      console.log(joined)
+      backedoutEvents.push(joined);
+    }
+    var result = {
+      data: backedoutEvents,
+    };
+    return res.status(200).json(result);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+}
+
+export const getAllBackedOutEvents = async (req, res) => {
+  var playerId = req.player._id;
+  var options = {
+    playerId: playerId,
+    requestType: "Cancelled",
+  };
+  try {
+    var events = await request.find(options).sort({ eventDay: -1 });
     console.log(events);
     if (events.length < 1) {
       var result = {
@@ -215,9 +304,43 @@ export const getRejectedEvents = async (req, res) => {
   var options = {
     playerId: playerId,
     requestType: "Rejected",
+    eventDay: {
+      $gte: new Date(Date.now()),
+    },
   };
   try {
-    var events = await request.find(options);
+    var events = await request.find(options).sort({ eventDay: 1 });
+    console.log(events);
+    if (events.length < 1) {
+      var result = {
+        data: [],
+      };
+      return res.status(200).json(result);
+    }
+    var rejectedEvents = [];
+    for (var i = 0; i < events.length; i++) {
+      var joined = await event.find({ _id: events[i].eventId });
+      joined.push(events[i])
+      console.log(joined)
+      rejectedEvents.push(joined);
+    }
+    var result = {
+      data: rejectedEvents,
+    };
+    return res.status(200).json(result);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+}
+
+export const getAllRejectedEvents = async (req, res) => {
+  var playerId = req.player._id;
+  var options = {
+    playerId: playerId,
+    requestType: "Rejected",
+  };
+  try {
+    var events = await request.find(options).sort({ eventDay: -1 });
     console.log(events);
     if (events.length < 1) {
       var result = {
