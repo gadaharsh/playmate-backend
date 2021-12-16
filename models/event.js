@@ -33,6 +33,10 @@ const eventScehma = mongoose.Schema({
     type: String,
     required: true,
   },
+  organiserContact: {
+    type: String,
+    required: false,
+  },
   age: {
     type: Number,
     required: true,
@@ -67,6 +71,26 @@ const eventScehma = mongoose.Schema({
   gender: {
     type: String,
     default: "Male",
+  },
+  joinedPlayers: {
+    type: [String],
+    default: [],
+  },
+  eventStatus: {
+    type: String,
+    default: "created",
+  },
+  cancelledAt: {
+    type: String,
+    required: false,
+  },
+  cancellationReason: {
+    type: String,
+    required: false,
+  },
+  rejectedPlayersId: {
+    type: [String],
+    default: [],
   },
 });
 

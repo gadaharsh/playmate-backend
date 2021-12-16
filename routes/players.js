@@ -1,10 +1,13 @@
 import express from "express";
-import { getPlayers, playerSignin, playerSignup } from "../controllers/players.js";
+import { deleteAllPlayers, getPlayerProfile, getPlayers, playerSignin, playerSignup } from "../controllers/players.js";
+import playerAuth from "../util/playerAuth.js";
 
 const router = express.Router();
 
-router.get('/',getPlayers);
-router.post('/signup',playerSignup)
-router.post('/login',playerSignin)
+router.get('/', getPlayers);
+router.post('/signup', playerSignup)
+router.post('/login', playerSignin)
+router.get('/profile/:id', getPlayerProfile)
+//router.delete('/delete', deleteAllPlayers)
 
 export default router;

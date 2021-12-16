@@ -5,19 +5,18 @@ import cors from "cors";
 import testRoute from "./routes/test.js";
 import playerRoute from "./routes/players.js";
 import eventRoute from "./routes/events.js";
+import requestRoute from "./routes/requests.js";
 import playerAuth from "./util/playerAuth.js";
 import { createEvent } from "./controllers/events.js";
 
 const app = express();
-
-/* app.use(bodyParser.json({ limit: "30mb", extended: true }));
-app.use(bodyParser.urlencoded({ limit: "30mb", extended: true })); */
 app.use(cors());
 app.use(express.json());
 
 app.use("/", testRoute);
 app.use("/player", playerRoute);
 app.use("/event", eventRoute);
+app.use("/booking", requestRoute);
 
 const CONNECTION_URL =
   "mongodb+srv://rushil:Playmate10$@cluster0.lcuyx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
@@ -34,5 +33,3 @@ mongoose
   .catch((error) => {
     console.log(error.message);
   });
-
-//mongoose.set("useFindAndModify", false);

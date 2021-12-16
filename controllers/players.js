@@ -2,6 +2,8 @@ import dotenv from "dotenv";
 dotenv.config({ silent: process.env.NODE_ENV === "production" });
 import player from "../models/playerDetails.js";
 import jwt from "jsonwebtoken";
+import event from "../models/event.js";
+import request from "../models/request.js";
 
 export const playerSignup = async (req, res) => {
   const body = req.body;
@@ -72,6 +74,64 @@ export const playerSignin = async (req, res) => {
   }
 };
 
+export const getPlayerProfile = async (req, res) => {
+  var playerId = req.params.id;
+  try {
+    var organisedFilter = {
+      organiserId: playerId
+    }
+    var joinedRequestsFilter = {
+      playerId,
+      requestType: "Join Event"
+    }
+    var backedOutEventsFilter = {
+      playerId,
+      requestType: "Cancelled"
+    }
+    var playerDetails = await player.findOne({ _id: playerId })
+    var allEvents = []
+    var organisedEvents = await event.find(organisedFilter)
+    console.log(organisedEvents)
+    var joinedRequests = await request.find(joinedRequestsFilter);
+    var backedOutRequests = await request.find(backedOutEventsFilter)
+    console.log(joinedRequests)
+    var joinedEvents = [];
+    for (var i = 0; i < joinedRequests.length; i++) {
+      var eventDet = await event.findOne({ _id: joinedRequests[i].eventId })
+      console.log(eventDet)
+      joinedEvents.push(eventDet)
+    }
+    console.log(joinedEvents)
+    allEvents = [...organisedEvents, ...joinedEvents];
+    var pieChart = {}
+    for (var i = 0; i < allEvents.length; i++) {
+      if (pieChart[allEvents[i].sport]) {
+        pieChart[allEvents[i].sport] += 1;
+      } else {
+        pieChart[allEvents[i].sport] = 1;
+      }
+    }
+    var labels = Object.keys(pieChart)
+    var values = Object.values(pieChart)
+    console.log(labels)
+    var analysis = {
+      organised: organisedEvents.length,
+      joined: joinedEvents.length,
+      backedOut: backedOutRequests.length
+    }
+    var data = {
+      pieChart,
+      labels,
+      values,
+      analysis,
+      playerDetails
+    }
+    res.status(200).json(data)
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+}
+
 export const getPlayers = async (req, res) => {
   try {
     const players = await player.find();
@@ -80,3 +140,12 @@ export const getPlayers = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+
+export const deleteAllPlayers = async (req, res) => {
+  try {
+    await player.deleteMany({});
+    res.status(200).json({ message: "Players Deleted" })
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+}

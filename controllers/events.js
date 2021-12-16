@@ -1,10 +1,14 @@
+import mongoose from "mongoose";
 import event from "../models/event.js";
-
+import player from "../models/playerDetails.js";
+import request from "../models/request.js";
+var ObjectId = mongoose.Types.ObjectId;
 export const createEvent = async (req, res) => {
   const body = req.body;
   var id = req.player._id;
   body.organiserId = id;
   body.gender = req.player.gender;
+  body.organiserContact = req.player.contact;
   console.log(body);
   const newEvent = new event(body);
   try {
@@ -31,6 +35,9 @@ export const getEventsNearMe = async (req, res) => {
     day: {
       $gte: new Date(Date.now()),
     },
+    rem_players: {
+      $gt: 0,
+    },
   };
   if (req.body.sport) {
     options.sport = req.body.sport;
@@ -41,7 +48,7 @@ export const getEventsNearMe = async (req, res) => {
   if (req.body.gender) {
     options.gender = req.body.gender;
   }
-  console.log(new Date(Date.now()));
+  console.log(options);
   if (req.body.day) {
     options.day = { $gte: req.body.day };
   }
@@ -72,6 +79,291 @@ export const getEventsNearMe = async (req, res) => {
     });
 };
 
+export const getEventsOrganisedByMe = async (req, res) => {
+  var id = req.player._id;
+  var options = {
+    organiserId: id,
+    day: {
+      $gte: new Date(Date.now()),
+    },
+  };
+  event
+    .find(options)
+    .sort({ day: 1 })
+    .then((data) => {
+      var result = {
+        data,
+      };
+      res.status(201).json(result);
+    })
+    .catch((error) => {
+      res.status(409).json({ message: error.message });
+    });
+};
+
+export const getAllEventsOrganisedByMe = async (req, res) => {
+  var id = req.player._id;
+  var options = {
+    organiserId: id,
+  };
+  event
+    .find(options)
+    .sort({ day: -1 })
+    .then((data) => {
+      var result = {
+        data,
+      };
+      res.status(201).json(result);
+    })
+    .catch((error) => {
+      res.status(409).json({ message: error.message });
+    });
+};
+
+export const getAllEventDetails = async (req, res) => {
+  const id = req.params.id;
+  var options = {
+    _id: id,
+  };
+  if (!ObjectId.isValid(id)) {
+    return res.status(409).json({ message: "No Valid Event For this Id" });
+  }
+  var filters = {
+    eventId: id,
+    //requestType: "Join Event",
+  };
+  var eventDetails = await event.find(options);
+  if (eventDetails.length < 1) {
+    res.status(409).json({ message: "No Event WIth This Id" });
+  }
+  var joiningPlayers = await request.find(filters);
+  var players = [];
+  var rejectedPlayers = [];
+  var backedOutPlayers = [];
+  for (var i = 0; i < joiningPlayers.length; i++) {
+    var playerData = await player.find({ _id: joiningPlayers[i].playerId });
+    if (joiningPlayers[i].requestType === "Join Event") {
+      players.push(playerData[0]);
+    } else if (joiningPlayers[i].requestType === "Rejected") {
+      var p2 = {
+        ...playerData[0]._doc,
+        requestInfo: joiningPlayers[i]
+      }
+      rejectedPlayers.push(p2)
+    } else {
+      var p = {
+        ...playerData[0]._doc,
+        requestInfo: joiningPlayers[i]
+      }
+      //backedOutPlayers.push(playerData[0])
+      backedOutPlayers.push(p)
+    }
+  }
+  var organiserDetails = await player.find({ _id: eventDetails[0].organiserId });
+  var result = {
+    event: eventDetails[0],
+    players: players,
+    rejectedPlayers,
+    backedOutPlayers,
+    organiserDetails: organiserDetails[0]
+  };
+  console.log(result);
+  res.status(201).json(result);
+};
+
+export const getJoinedPlayerEvents = async (req, res) => {
+  var playerId = req.player._id;
+  var options = {
+    playerId: playerId,
+    requestType: "Join Event",
+    eventDay: {
+      $gte: new Date(Date.now()),
+    },
+  };
+  try {
+    var events = await request.find(options).sort({ eventDay: 1 });
+    console.log(events);
+    if (events.length < 1) {
+      var result = {
+        data: [],
+      };
+      return res.status(200).json(result);
+    }
+    var joinedEvents = [];
+    for (var i = 0; i < events.length; i++) {
+      var joined = await event.find({ _id: events[i].eventId });
+      console.log(joined);
+      joinedEvents.push(joined[0]);
+    }
+    var result = {
+      data: joinedEvents,
+    };
+    return res.status(200).json(result);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+};
+
+export const getAllJoinedPlayerEvents = async (req, res) => {
+  var playerId = req.player._id;
+  var options = {
+    playerId: playerId,
+    requestType: "Join Event",
+  };
+  try {
+    var events = await request.find(options).sort({ eventDay: -1 });
+    console.log(events);
+    if (events.length < 1) {
+      var result = {
+        data: [],
+      };
+      return res.status(200).json(result);
+    }
+    var joinedEvents = [];
+    for (var i = 0; i < events.length; i++) {
+      var joined = await event.find({ _id: events[i].eventId });
+      console.log(joined);
+      joinedEvents.push(joined[0]);
+    }
+    var result = {
+      data: joinedEvents,
+    };
+    return res.status(200).json(result);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+};
+
+export const getBackedOutEvents = async (req, res) => {
+  var playerId = req.player._id;
+  var options = {
+    playerId: playerId,
+    requestType: "Cancelled",
+    eventDay: {
+      $gte: new Date(Date.now()),
+    },
+  };
+  try {
+    var events = await request.find(options).sort({ eventDay: 1 });
+    console.log(events);
+    if (events.length < 1) {
+      var result = {
+        data: [],
+      };
+      return res.status(200).json(result);
+    }
+    var backedoutEvents = [];
+    for (var i = 0; i < events.length; i++) {
+      var joined = await event.find({ _id: events[i].eventId });
+      joined.push(events[i])
+      console.log(joined)
+      backedoutEvents.push(joined);
+    }
+    var result = {
+      data: backedoutEvents,
+    };
+    return res.status(200).json(result);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+}
+
+export const getAllBackedOutEvents = async (req, res) => {
+  var playerId = req.player._id;
+  var options = {
+    playerId: playerId,
+    requestType: "Cancelled",
+  };
+  try {
+    var events = await request.find(options).sort({ eventDay: -1 });
+    console.log(events);
+    if (events.length < 1) {
+      var result = {
+        data: [],
+      };
+      return res.status(200).json(result);
+    }
+    var backedoutEvents = [];
+    for (var i = 0; i < events.length; i++) {
+      var joined = await event.find({ _id: events[i].eventId });
+      joined.push(events[i])
+      console.log(joined)
+      backedoutEvents.push(joined);
+    }
+    var result = {
+      data: backedoutEvents,
+    };
+    return res.status(200).json(result);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+}
+
+export const getRejectedEvents = async (req, res) => {
+  var playerId = req.player._id;
+  var options = {
+    playerId: playerId,
+    requestType: "Rejected",
+    eventDay: {
+      $gte: new Date(Date.now()),
+    },
+  };
+  try {
+    var events = await request.find(options).sort({ eventDay: 1 });
+    console.log(events);
+    if (events.length < 1) {
+      var result = {
+        data: [],
+      };
+      return res.status(200).json(result);
+    }
+    var rejectedEvents = [];
+    for (var i = 0; i < events.length; i++) {
+      var joined = await event.find({ _id: events[i].eventId });
+      joined.push(events[i])
+      console.log(joined)
+      rejectedEvents.push(joined);
+    }
+    var result = {
+      data: rejectedEvents,
+    };
+    return res.status(200).json(result);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+}
+
+export const getAllRejectedEvents = async (req, res) => {
+  var playerId = req.player._id;
+  var options = {
+    playerId: playerId,
+    requestType: "Rejected",
+  };
+  try {
+    var events = await request.find(options).sort({ eventDay: -1 });
+    console.log(events);
+    if (events.length < 1) {
+      var result = {
+        data: [],
+      };
+      return res.status(200).json(result);
+    }
+    var rejectedEvents = [];
+    for (var i = 0; i < events.length; i++) {
+      var joined = await event.find({ _id: events[i].eventId });
+      joined.push(events[i])
+      console.log(joined)
+      rejectedEvents.push(joined);
+    }
+    var result = {
+      data: rejectedEvents,
+    };
+    return res.status(200).json(result);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+}
+
 export const getEventsDummy = async (req, res) => {
   try {
     const events = await event.find();
@@ -80,3 +372,12 @@ export const getEventsDummy = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+
+export const deleteAllEvents = async (req, res) => {
+  try {
+    await event.deleteMany({});
+    res.status(200).json({ message: "Events Deleted" })
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+}
