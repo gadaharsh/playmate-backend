@@ -47,5 +47,4 @@ const eventSchema = mongoose.Schema({
 });
 
 const event = mongoose.model("event", playerSchema);
-
 export default event;
