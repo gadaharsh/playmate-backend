@@ -9,6 +9,7 @@ export const playerSignup = async (req, res) => {
   const body = req.body;
   console.log(body);
   const newPlayer = new player(body);
+  
   try {
     await newPlayer.save();
     const token = jwt.sign(newPlayer.toJSON(), process.env.ACCESS_TOKEN_SECRET);
