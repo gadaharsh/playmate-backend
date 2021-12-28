@@ -18,8 +18,8 @@ Find and Join sports event near you. Easily create and manage sports event. View
 #### -> Node/Express
 
 ## Members
-#### 1911122 Rushil
-#### 1911075 Harsh
+- 1911122 Rushil
+- 1911075 Harsh
 
 ## College: KJSCE
 ## Course: MERN
