@@ -12,3 +12,10 @@
 #### -> MongoDB
 #### -> Firebase
 #### -> Node/Express
+
+## Members
+#### 1911122 Rushil
+#### 1911075 Harsh
+
+## College: KJSCE
+## Course: MERN
