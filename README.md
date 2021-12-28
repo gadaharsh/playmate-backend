@@ -1,3 +1,7 @@
+# Playmate
+Find and Join sports event near you. Easily create and manage sports event. View your sports intrests and analysis.
+#### You can view the project at https://playmate.vercel.app/
+
 # Playmate Backend
 
 ## Features
