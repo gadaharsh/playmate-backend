@@ -40,6 +40,14 @@ const playerSchema = mongoose.Schema({
     type: Number,
     default: 2,
   },
+  webFcmToken: {
+    type: [String],
+    required: false,
+  },
+  phoneFcmToken: {
+    type: String,
+    required: false,
+  }
 });
 
 const player = mongoose.model("player", playerSchema);

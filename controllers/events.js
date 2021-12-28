@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import event from "../models/event.js";
 import player from "../models/playerDetails.js";
 import request from "../models/request.js";
+import { sendNotification } from "./notification.js";
 var ObjectId = mongoose.Types.ObjectId;
 export const createEvent = async (req, res) => {
   const body = req.body;
@@ -38,6 +39,7 @@ export const getEventsNearMe = async (req, res) => {
     rem_players: {
       $gt: 0,
     },
+    eventStatus: "created"
   };
   if (req.body.sport) {
     options.sport = req.body.sport;
@@ -78,6 +80,54 @@ export const getEventsNearMe = async (req, res) => {
       res.status(409).json({ message: error.message });
     });
 };
+
+export const cancelEvent = async (req, res) => {
+  var playerDetails = req.player;
+  var reason = req.body.reason;
+  var eventId = req.body.eventId;
+  var organiserId = req.body.organiserId;
+  const options = {
+    _id: eventId
+  }
+  if (playerDetails._id === organiserId) {
+    await event.findOneAndUpdate(options,
+      {
+        $set: {
+          eventStatus: "Cancelled",
+          cancellationReason: reason,
+          cancelledAt: new Date()
+        }
+      }
+    )
+    var requests = await request.find({ eventId: eventId, requestType: "Join Event" })
+    var tokens = [];
+    for (var i = 0; i < requests.length; i++) {
+      var players = await player.find({ _id: requests[i].playerId })
+      if (players[0].webFcmToken.length > 0) {
+        tokens = [...tokens, ...players[0].webFcmToken]
+      }
+    }
+    if (tokens.length > 0) {
+      var eventDetails = await event.find({ _id: eventId })
+      var notTitle = `${eventDetails[0].sport} event has been cancelled`
+      var notBody = `Cancellation Reason : ${reason}`
+      sendNotification(notTitle, notBody, tokens)
+    }
+    var message = {
+      message: "Event Cancelled",
+      eventId,
+      organiserId
+    }
+    res.status(200).json(message);
+  } else {
+    var message = {
+      message: "You are not authorised to cancel event.Only Event Organiser can cancel event.",
+      eventId,
+      organiserId
+    }
+    res.status(409).json(message);
+  }
+}
 
 export const getEventsOrganisedByMe = async (req, res) => {
   var id = req.player._id;

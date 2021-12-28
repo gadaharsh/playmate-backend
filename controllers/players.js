@@ -4,12 +4,12 @@ import player from "../models/playerDetails.js";
 import jwt from "jsonwebtoken";
 import event from "../models/event.js";
 import request from "../models/request.js";
+import { testNotification } from "./notification.js";
 
 export const playerSignup = async (req, res) => {
   const body = req.body;
   console.log(body);
   const newPlayer = new player(body);
-  
   try {
     await newPlayer.save();
     const token = jwt.sign(newPlayer.toJSON(), process.env.ACCESS_TOKEN_SECRET);
@@ -130,6 +130,24 @@ export const getPlayerProfile = async (req, res) => {
     res.status(200).json(data)
   } catch (error) {
     res.status(409).json({ message: error.message });
+  }
+}
+
+export const addWebFcmToken = async (req, res) => {
+  var playerId = req.player._id
+  try {
+    await player.findOneAndUpdate({ _id: playerId }, {
+      $addToSet: {
+        webFcmToken: req.body.fcmToken
+      }
+    })
+    var response = {
+      message: "FcmToken Added"
+    };
+    //testNotification("Adding Token", "Adding Token Successfull", req.body.fcmToken)
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
   }
 }
 

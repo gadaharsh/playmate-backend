@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  cancelEvent,
   createEvent,
   deleteAllEvents,
   getAllBackedOutEvents,
@@ -21,6 +22,7 @@ const router = express.Router();
 router.get("/dummy", getEventsDummy);
 router.post("/nearMe", getEventsNearMe);
 router.post("/create", playerAuth, createEvent);
+router.post("/cancel", playerAuth, cancelEvent);
 router.get("/player", playerAuth, getEventsOrganisedByMe);
 router.get("/player/all", playerAuth, getAllEventsOrganisedByMe);
 router.get("/player/joined", playerAuth, getJoinedPlayerEvents);

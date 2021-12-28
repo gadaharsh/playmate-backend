@@ -81,7 +81,7 @@ const eventScehma = mongoose.Schema({
     default: "created",
   },
   cancelledAt: {
-    type: String,
+    type: Date,
     required: false,
   },
   cancellationReason: {
